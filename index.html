@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Studio Legal</title>
+  <style>
+    :root {
+      --primary: #1663ff;
+      --ink: #1f2937;
+      --muted: #667085;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --border: #dfe4ee;
+      --soft: #eef4ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      line-height: 1.65;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    .shell {
+      width: min(920px, calc(100% - 32px));
+      margin: 32px auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+    }
+
+    header {
+      padding: 34px 34px 24px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .logo {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--primary);
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.1;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tab,
+    select {
+      min-height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      padding: 0 14px;
+    }
+
+    .tab {
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .tab.active {
+      border-color: var(--primary);
+      background: var(--soft);
+      color: var(--primary);
+    }
+
+    select {
+      margin-left: auto;
+    }
+
+    main {
+      padding: 34px;
+    }
+
+    .doc-title {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.15;
+      color: var(--primary);
+    }
+
+    .updated {
+      margin: 8px 0 28px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    h2 {
+      margin: 34px 0 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      color: var(--primary);
+      font-size: 22px;
+    }
+
+    p {
+      margin: 12px 0;
+    }
+
+    ul {
+      margin: 12px 0 18px;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 8px 0;
+    }
+
+    code {
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: #eef2f7;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.95em;
+    }
+
+    .notice {
+      margin-top: 30px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fbfcff;
+      color: var(--muted);
+    }
+
+    footer {
+      padding: 22px 34px 32px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    a {
+      color: var(--primary);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    [dir="rtl"] body {
+      text-align: right;
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        width: 100%;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+      }
+
+      header,
+      main,
+      footer {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      select {
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .doc-title {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">PDF</div>
+        <div>
+          <h1>PDF Studio</h1>
+          <p id="subtitle">Legal documents</p>
+        </div>
+      </div>
+
+      <div class="controls" aria-label="Document controls">
+        <button class="tab" id="privacyBtn" type="button">Privacy Policy</button>
+        <button class="tab" id="termsBtn" type="button">Terms of Service</button>
+        <select id="languageSelect" aria-label="Language"></select>
+      </div>
+    </header>
+
+    <main id="document"></main>
+
+    <footer>
+      <span id="footerText"></span>
+    </footer>
+  </div>
+
+  <script>
+    const SUPPORT_EMAIL = "TODO-add-your-support-email@example.com";
+    const PRIVACY_URL = "TODO-add-your-public-privacy-policy-url";
+
+    const legal = {
+      en: {
+        name: "English",
+        dir: "ltr",
+        subtitle: "Legal documents",
+        footer: "For questions, contact " + SUPPORT_EMAIL + ".",
+        privacy: {
+          title: "Privacy Policy",
+          updated: "Last updated: June 30, 2026",
+          sections: [
+            {
+              heading: "Overview",
+              body: [
+                "This Privacy Policy explains how PDF Studio handles information when you use the PDF Studio mobile application. PDF Studio helps you create, convert, scan, view, edit, organize, protect, sign, compress, split, merge, watermark, extract text from, and share PDF files.",
+                "We do not sell your documents. We do not require you to create an account. Files you choose, create, scan, convert, edit, or save are generally processed locally on your device."
+              ],
+              list: [
+                "The app may use third-party services for ads, purchases, crash reporting, and store/platform features.",
+                "Third-party services may collect device, diagnostics, usage, advertising, and purchase-related information according to their own policies.",
+                "You control camera, photos, files, notifications, and other permissions through your device settings."
+              ]
+            },
+            {
+              heading: "Information You Provide or Create",
+              body: [
+                "PDF Studio may process files and information on your device when you choose to use app features."
+              ],
+              list: [
+                "PDF files, images, photos, scanned documents, text files, signatures, watermarks, folders, tags, filenames, and related document metadata.",
+                "Files selected through your device file picker or photo library.",
+                "Images captured through your device camera.",
+                "Text recognized from PDFs or images using OCR features.",
+                "Output files created by the app, including converted PDFs, compressed PDFs, image exports, split PDFs, merged PDFs, signed PDFs, protected PDFs, and extracted text files."
+              ]
+            },
+            {
+              heading: "Permissions",
+              body: [
+                "PDF Studio may request permissions only when needed for a feature. You can deny or revoke permissions in your device settings. Some features may not work without the required permission."
+              ],
+              list: [
+                "Camera: to scan documents or capture images.",
+                "Photo library or media access: to select images, import media, or save converted files.",
+                "Files or storage access: to select, read, create, save, export, or share files.",
+                "Notifications: to show progress or completion alerts for background PDF processing.",
+                "Foreground service or background processing permissions on Android: to continue long-running document operations and show progress."
+              ]
+            },
+            {
+              heading: "Local Document Processing",
+              body: [
+                "PDF Studio is intended to process your documents locally on your device. We do not operate a document upload server for normal PDF conversion, scanning, compression, OCR, merging, splitting, signing, watermarking, or file organization features.",
+                "If you share a file using your device share sheet or save a file to another app or cloud location, that third-party app or service will handle the file according to its own terms and privacy policy."
+              ]
+            },
+            {
+              heading: "OCR and Text Extraction",
+              body: [
+                "PDF Studio may use on-device text recognition libraries to identify text in images or image-based PDF pages. OCR results may be stored locally when you save them as a text file or another output. OCR may be imperfect, and you should review extracted text before relying on it."
+              ]
+            },
+            {
+              heading: "Advertising",
+              body: [
+                "PDF Studio may display ads using Google Mobile Ads / AdMob. Advertising providers may collect or receive information for ad delivery, ad measurement, fraud prevention, analytics, and service improvement."
+              ],
+              list: [
+                "Device identifiers, including advertising identifiers where available.",
+                "IP address or approximate location inferred from IP address.",
+                "Ad interaction data, such as ads shown, clicks, impressions, and related advertising data.",
+                "App interaction and performance information.",
+                "Diagnostic information related to the ads SDK."
+              ]
+            },
+            {
+              heading: "Crash Reporting and Diagnostics",
+              body: [
+                "PDF Studio may use Firebase Crashlytics to help diagnose crashes, improve reliability, and understand technical failures. Crash reports are used to identify and fix bugs."
+              ],
+              list: [
+                "Crash traces and stack traces.",
+                "App version, bundle identifier, and build number.",
+                "Device model, operating system version, CPU architecture, memory, disk space, and related diagnostics.",
+                "Installation identifiers used by Firebase or Crashlytics.",
+                "Timestamps and technical details associated with crashes."
+              ]
+            },
+            {
+              heading: "Purchases",
+              body: [
+                "PDF Studio may offer a one-time, non-consumable premium purchase. Purchases are processed by Apple App Store, Google Play, or another applicable app store. We do not receive or store your full payment card details.",
+                "Product ID: <code>pdfstudio_premium_lifetime</code>. Purpose: unlock Premium features and/or remove ads, as described in the app at the time of purchase."
+              ]
+            },
+            {
+              heading: "Data We Do Not Intentionally Collect",
+              body: [
+                "PDF Studio does not require account registration and does not intentionally collect your name, email address, phone number, postal address, contacts, precise GPS location, payment card number, or the contents of your documents on our own servers for normal app functionality."
+              ]
+            },
+            {
+              heading: "Third-Party Services",
+              body: [
+                "PDF Studio may include or interact with Google Mobile Ads / AdMob, Firebase and Firebase Crashlytics, Apple App Store and StoreKit, Google Play and Google Play Billing, and platform file picker, camera, photo library, sharing, notification, and storage services."
+              ]
+            },
+            {
+              heading: "Retention, Security, and Your Choices",
+              body: [
+                "Files you create or import remain on your device until you delete them, uninstall the app, clear app data, or move/share them elsewhere. You can revoke permissions, manage ad personalization, restore purchases, request refunds through the app store, and contact us about privacy requests.",
+                "No method of storage or processing is perfectly secure. Protect your device with a passcode or biometric lock and avoid sharing sensitive documents with apps or people you do not trust."
+              ]
+            },
+            {
+              heading: "Children and Privacy Rights",
+              body: [
+                "PDF Studio is not directed to children under 13, or the equivalent minimum age in your jurisdiction. We do not knowingly collect personal information from children through an account system.",
+                "Depending on your location, you may have rights to access, delete, correct, restrict, object to, or receive a copy of personal information. Contact us to make a privacy request."
+              ]
+            },
+            {
+              heading: "Changes and Contact",
+              body: [
+                "We may update this Privacy Policy from time to time. The updated policy will be posted with a new Last updated date.",
+                "For privacy questions, contact: <a href=\"mailto:" + SUPPORT_EMAIL + "\">" + SUPPORT_EMAIL + "</a>."
+              ]
+            }
+          ]
+        },
+        terms: {
+          title: "Terms of Service",
+          updated: "Last updated: June 30, 2026",
+          sections: [
+            {
+              heading: "Agreement",
+              body: [
+                "These Terms of Service govern your use of PDF Studio. By downloading, accessing, or using PDF Studio, you agree to these Terms. If you do not agree, do not use the app.",
+                "PDF Studio provides tools for creating, converting, scanning, viewing, organizing, editing, protecting, signing, compressing, splitting, merging, watermarking, extracting text from, and sharing PDF files and related documents."
+              ]
+            },
+            {
+              heading: "License",
+              body: [
+                "Subject to these Terms and app store rules, we grant you a limited, non-exclusive, non-transferable, revocable license to install and use PDF Studio for personal or internal business use."
+              ],
+              list: [
+                "You may not copy, modify, reverse engineer, decompile, sell, rent, lease, sublicense, or distribute the app except where allowed by law.",
+                "You may not use the app to violate laws, third-party rights, app security, app store systems, ads, purchases, or licensing."
+              ]
+            },
+            {
+              heading: "Your Documents",
+              body: [
+                "You keep ownership of the documents, images, text, signatures, watermarks, filenames, folders, and other content you create, import, scan, edit, save, or share using PDF Studio.",
+                "You are responsible for your content and for making sure you have the rights and permissions needed to process, edit, convert, sign, protect, export, or share it."
+              ]
+            },
+            {
+              heading: "Local Processing and Backups",
+              body: [
+                "PDF Studio is designed to process documents primarily on your device. You are responsible for saving, backing up, exporting, and protecting important files. Before editing important documents, keep a separate backup copy."
+              ]
+            },
+            {
+              heading: "Accuracy and Document Tools",
+              body: [
+                "OCR, text extraction, image conversion, compression, page manipulation, PDF protection, signatures, and PDF processing can produce errors or unexpected results. Review output files carefully before relying on them.",
+                "Signature and password features are convenience tools and do not guarantee legal enforceability, identity verification, document authenticity, non-repudiation, encryption strength for all use cases, or compliance with any specific regulation."
+              ]
+            },
+            {
+              heading: "Premium Purchase",
+              body: [
+                "PDF Studio may offer a one-time, non-consumable premium purchase. Product ID: <code>pdfstudio_premium_lifetime</code>. Premium may unlock features and/or remove ads, as described in the app at purchase time.",
+                "Prices, taxes, currency, availability, and included features may vary by country, platform, store, and version. Cross-platform access between iOS and Android is not guaranteed unless explicitly stated."
+              ]
+            },
+            {
+              heading: "Payments, Refunds, and Billing",
+              body: [
+                "Payments are processed by the app store where you download or purchase the app, such as Apple App Store or Google Play. Refunds, cancellations, taxes, billing disputes, family sharing, and purchase restoration are handled by the app store according to that store's policies."
+              ]
+            },
+            {
+              heading: "Ads and Third-Party Services",
+              body: [
+                "The free version of PDF Studio may show ads. Ads may be delivered by third-party advertising providers. We are not responsible for third-party ad content, products, services, websites, or claims.",
+                "PDF Studio may rely on third-party libraries, SDKs, platforms, and services, including app store services, advertising services, crash reporting services, PDF libraries, OCR libraries, file pickers, camera/photo APIs, sharing APIs, and notification APIs."
+              ]
+            },
+            {
+              heading: "Privacy",
+              body: [
+                "Our Privacy Policy explains how information is handled when you use PDF Studio. Privacy Policy URL: <a href=\"" + PRIVACY_URL + "\">" + PRIVACY_URL + "</a>."
+              ]
+            },
+            {
+              heading: "User Conduct",
+              body: [
+                "You agree not to use PDF Studio to violate any law, infringe rights, create or share unlawful content, bypass security measures, misrepresent a signature or document status, or interfere with app operation, app stores, billing systems, ads, analytics, or crash reporting."
+              ]
+            },
+            {
+              heading: "Intellectual Property",
+              body: [
+                "PDF Studio, including its software, design, branding, icons, interface, and other app materials, is owned by us or our licensors and is protected by intellectual property laws. These Terms do not transfer ownership of the app to you."
+              ]
+            },
+            {
+              heading: "Disclaimer and Limitation of Liability",
+              body: [
+                "PDF Studio is provided as is and as available to the maximum extent permitted by law. We do not guarantee that the app will be uninterrupted, error-free, secure, compatible with every file, or suitable for your purpose.",
+                "To the maximum extent permitted by law, we will not be liable for indirect, incidental, special, consequential, exemplary, or punitive damages, or for loss of profits, revenue, data, documents, business, goodwill, or device functionality."
+              ]
+            },
+            {
+              heading: "Changes and Contact",
+              body: [
+                "We may update these Terms from time to time. The updated Terms will be posted with a new Last updated date. Your continued use of PDF Studio after changes become effective means you accept the updated Terms, where permitted by law.",
+                "For support or terms questions, contact: <a href=\"mailto:" + SUPPORT_EMAIL + "\">" + SUPPORT_EMAIL + "</a>."
+              ]
+            }
+          ]
+        }
+      }
+    };
+
+    function getParams() {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        lang: params.get("lang") || "en",
+        doc: params.get("doc") || "privacy"
+      };
+    }
+
+    function setParams(next) {
+      const current = getParams();
+      const params = new URLSearchParams({
+        lang: next.lang || current.lang,
+        doc: next.doc || current.doc
+      });
+      history.replaceState(null, "", "?" + params.toString());
+      render();
+    }
+
+    function renderLanguageOptions(selectedLang) {
+      const select = document.getElementById("languageSelect");
+      select.innerHTML = "";
+      Object.entries(legal).forEach(([code, value]) => {
+        const option = document.createElement("option");
+        option.value = code;
+        option.textContent = value.name;
+        option.selected = code === selectedLang;
+        select.appendChild(option);
+      });
+    }
+
+    function renderSections(sections) {
+      return sections.map((section) => {
+        const body = (section.body || []).map((p) => "<p>" + p + "</p>").join("");
+        const list = section.list
+          ? "<ul>" + section.list.map((item) => "<li>" + item + "</li>").join("") + "</ul>"
+          : "";
+        return "<section><h2>" + section.heading + "</h2>" + body + list + "</section>";
+      }).join("");
+    }
+
+    function render() {
+      const params = getParams();
+      const lang = legal[params.lang] ? params.lang : "en";
+      const doc = params.doc === "terms" ? "terms" : "privacy";
+      const data = legal[lang];
+      const documentData = data[doc];
+
+      document.documentElement.lang = lang;
+      document.documentElement.dir = data.dir;
+      document.title = "PDF Studio - " + documentData.title;
+
+      document.getElementById("subtitle").textContent = data.subtitle;
+      document.getElementById("footerText").textContent = data.footer;
+      document.getElementById("privacyBtn").textContent = data.privacy.title;
+      document.getElementById("termsBtn").textContent = data.terms.title;
+      document.getElementById("privacyBtn").classList.toggle("active", doc === "privacy");
+      document.getElementById("termsBtn").classList.toggle("active", doc === "terms");
+
+      renderLanguageOptions(lang);
+
+      document.getElementById("document").innerHTML =
+        "<h1 class=\"doc-title\">" + documentData.title + "</h1>" +
+        "<p class=\"updated\">" + documentData.updated + "</p>" +
+        renderSections(documentData.sections) +
+        "<div class=\"notice\">This page is provided for app store review and user reference. Replace TODO values before publishing.</div>";
+    }
+
+    document.getElementById("privacyBtn").addEventListener("click", () => setParams({ doc: "privacy" }));
+    document.getElementById("termsBtn").addEventListener("click", () => setParams({ doc: "terms" }));
+    document.getElementById("languageSelect").addEventListener("change", (event) => setParams({ lang: event.target.value }));
+
+    render();
+  </script>
+</body>
+</html>
