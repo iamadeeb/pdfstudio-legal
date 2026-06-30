@@ -795,8 +795,7 @@
       document.getElementById("document").innerHTML =
         "<h1 class=\"doc-title\">" + documentData.title + "</h1>" +
         "<p class=\"updated\">" + documentData.updated + "</p>" +
-        renderSections(documentData.sections) +
-        "<div class=\"notice\">This page is provided for app store review and user reference. Replace TODO values before publishing.</div>";
+        renderSections(documentData.sections);
     }
 
     document.getElementById("privacyBtn").addEventListener("click", () => setParams({ doc: "privacy" }));
